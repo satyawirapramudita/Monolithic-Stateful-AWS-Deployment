@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Puisi - Monolitik Stateful</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body bgcolor="#ffffff" text="#000000">
+
+<center>
+    <h1>Aplikasi Puisi</h1>
+    <p><b>Backend Monolitik Stateful - Single Path Routing</b></p>
+    <p>
+        Sesi: <span id="session-info">Memeriksa sesi...</span>
+        &nbsp; <button id="btn-logout" class="hidden" type="button">Logout</button>
+    </p>
+    <hr width="80%">
+</center>
+
+<table align="center" width="70%" cellpadding="5">
+<tr><td>
+
+    <div id="auth-panel">
+        <p align="center">
+            <button id="tab-login" class="tab active" type="button">Login</button>
+            <button id="tab-register" class="tab" type="button">Register</button>
+        </p>
+
+        <form id="form-login" action="#">
+            <fieldset>
+                <legend><b>Login</b></legend>
+                Username: <br>
+                <input type="text" id="login-username" name="username" required autocomplete="username" size="30"><br><br>
+                Password: <br>
+                <input type="password" id="login-password" name="password" required autocomplete="current-password" size="30"><br><br>
+                <input type="submit" value="Masuk">
+            </fieldset>
+        </form>
+
+        <form id="form-register" class="hidden" action="#">
+            <fieldset>
+                <legend><b>Register</b></legend>
+                Username: <br>
+                <input type="text" id="reg-username" name="username" required autocomplete="username" size="30"><br><br>
+                Nama Lengkap: <br>
+                <input type="text" id="reg-nama" name="nama" required size="30"><br><br>
+                Password: <br>
+                <input type="password" id="reg-password" name="password" required minlength="6" autocomplete="new-password" size="30"><br><br>
+                <input type="submit" value="Daftar">
+            </fieldset>
+        </form>
+
+        <p align="center" class="message" id="auth-message"></p>
+    </div>
+
+    <div id="app-panel" class="hidden">
+        <form id="form-puisi" action="#">
+            <fieldset>
+                <legend><b>Unggah Puisi</b></legend>
+                Judul: <br>
+                <input type="text" id="puisi-judul" name="judul" required maxlength="150" size="50"><br><br>
+                Kategori: <br>
+                <input type="text" id="puisi-kategori" name="kategori" required maxlength="50" size="50" placeholder="contoh: Alam, Cinta, Persahabatan"><br><br>
+                Keywords (opsional): <br>
+                <input type="text" id="puisi-keyword" name="keyword" maxlength="255" size="50" placeholder="pisahkan dengan koma"><br><br>
+                Isi Puisi: <br>
+                <textarea id="puisi-isi" name="isi" rows="8" cols="50" required></textarea><br><br>
+                <input type="submit" value="Kirim Puisi">
+            </fieldset>
+        </form>
+
+        <p class="message" id="puisi-message"></p>
+
+        <h3>Daftar Puisi Saya</h3>
+        <button id="btn-refresh" type="button">Muat Ulang</button>
+        <table id="tabel-puisi" width="100%" border="1" cellpadding="4" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Tgl Submit</th>
+                    <th>Judul</th>
+                    <th>Kategori</th>
+                    <th>Keyword</th>
+                    <th>Isi</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</td></tr>
+</table>
+
+<hr width="80%">
+<center>
+    <p><i>PACS262521 - Pengembangan Perangkat Lunak Scalable</i></p>
+</center>
+
+<script src="/app.js"></script>
+</body>
+</html>
