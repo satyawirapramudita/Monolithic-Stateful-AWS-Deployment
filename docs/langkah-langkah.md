@@ -446,13 +446,19 @@ Simpan screenshot pada folder `docs/screenshots/` dengan nama yang konsisten:
 | 4 | `04-user-data.png` | User Data atau hasil cloud-init |
 | 5 | `05-ssh-docker-swap.png` | Versi Docker, Compose, dan swap |
 | 6 | `06-compose-healthy.png` | Output `docker compose ps` |
-| 7 | `07-browser-public-ip.png` | Aplikasi dibuka melalui Public IP |
-| 8 | `08-register-login.png` | Register dan login berhasil |
-| 9 | `09-set-cookie.png` | Header `Set-Cookie: SID` pada Network |
-| 10 | `10-submit-puisi.png` | Puisi berhasil dikirim dan tampil di tabel |
-| 11 | `11-refresh-text-flash.png` | Text flash setelah klik `Muat Ulang` |
-| 12 | `12-api-testing.png` | Hasil pengujian endpoint |
-| 13 | `13-stateful-before-after.png` | Session valid sebelum dan invalid setelah recreate |
+| 7 | `08-register.png` | Register berhasil |
+| 8 | `08-login.png` | Login berhasil |
+| 9 | `08-login(1).png` | Halaman setelah login |
+| 10 | `09-set-cookie.png` | Header `Set-Cookie: SID` pada Network |
+| 11 | `10-submit-puisi.png` | Puisi disubmit pertama kali |
+| 12 | `10-submit-puisi(1).png` | Hasil muat ulang daftar puisi |
+| 13 | `11-api-testing-register.png` | Output Invoke-WebRequest: register |
+| 14 | `11-api-testing-login.png` | Output Invoke-WebRequest: login |
+| 15 | `11-api-testing-submit_puisi.png` | Output Invoke-WebRequest: submit puisi |
+| 16 | `11-api-testing-daftar_puisi.png` | Output Invoke-WebRequest: daftar puisi |
+| 17 | `11-api-testing-action_me.png` | Output Invoke-WebRequest: action `me` |
+| 18 | `13-restart-container.png` | Perintah `--force-recreate` container |
+| 19 | `13-sesi-invalid.png` | Sesi invalid setelah recreate via action `me` |
 
 ## 14. Penyusunan Laporan PDF
 

@@ -238,13 +238,22 @@ Frontend memiliki fitur:
 
 Request dilakukan secara same-origin sehingga browser mengirim cookie SID secara otomatis.
 
-![Halaman frontend](screenshots/07-browser-public-ip.png)
+![Register berhasil](screenshots/08-register.png)
 
-*Gambar 4. Placeholder screenshot halaman frontend melalui Public IP EC2.*
+*Gambar 4a. Placeholder screenshot register berhasil.*
 
-![Text flash refresh](screenshots/11-refresh-text-flash.png)
+![Login berhasil](screenshots/08-login.png)
 
-*Gambar 5. Placeholder screenshot text flash setelah tombol Muat Ulang ditekan.*
+*Gambar 4b. Placeholder screenshot login berhasil.*
+
+![Halaman setelah login](screenshots/08-login%281%29.png)
+
+*Gambar 4c. Placeholder screenshot halaman setelah login.*
+
+
+
+
+
 
 ## 6. Deployment pada AWS EC2
 
@@ -364,9 +373,25 @@ Hasil pengujian end-to-end melalui Public IP:
 | `GET /?action=daftar_puisi` | 200 | Puisi berhasil diambil |
 | `GET /?action=me` setelah login | 200 | `ok: true` |
 
-![API testing](screenshots/12-api-testing.png)
+![Invoke-WebRequest register](screenshots/11-api-testing-register.png)
 
-*Gambar 10. Placeholder screenshot hasil pengujian endpoint.*
+*Gambar 10a. Placeholder output Invoke-WebRequest register.*
+
+![Invoke-WebRequest login](screenshots/11-api-testing-login.png)
+
+*Gambar 10b. Placeholder output Invoke-WebRequest login.*
+
+![Invoke-WebRequest submit puisi](screenshots/11-api-testing-submit_puisi.png)
+
+*Gambar 10c. Placeholder output Invoke-WebRequest submit puisi.*
+
+![Invoke-WebRequest daftar puisi](screenshots/11-api-testing-daftar_puisi.png)
+
+*Gambar 10d. Placeholder output Invoke-WebRequest daftar puisi.*
+
+![Invoke-WebRequest me](screenshots/11-api-testing-action_me.png)
+
+*Gambar 10e. Placeholder output Invoke-WebRequest action `me`.*
 
 ### 7.3 Data Uji
 
@@ -389,9 +414,13 @@ Isi: Aplikasi puisi berhasil berjalan di EC2 Singapore.
 
 Kredensial tersebut hanya digunakan sebagai akun demonstrasi. Password harus diganti atau akun dihapus setelah kegiatan demo selesai.
 
-![Submit puisi](screenshots/10-submit-puisi.png)
+![Submit puisi pertama](screenshots/10-submit-puisi.png)
 
-*Gambar 11. Placeholder screenshot submit puisi dan daftar puisi.*
+*Gambar 11a. Placeholder screenshot puisi saat pertama kali disubmit.*
+
+![Load puisi](screenshots/10-submit-puisi%281%29.png)
+
+*Gambar 11b. Placeholder screenshot hasil load atau muat ulang puisi.*
 
 ## 8. Bukti Stateful
 
@@ -429,9 +458,13 @@ Hasil ini membuktikan bahwa session disimpan pada filesystem container app. Cont
 
 > **Catatan:** `docker compose restart app` tidak digunakan sebagai bukti utama karena restart dapat mempertahankan filesystem container. Perintah `--force-recreate` digunakan agar container benar-benar dibuat ulang.
 
-![Stateful before and after](screenshots/13-stateful-before-after.png)
+![Restart container](screenshots/13-restart-container.png)
 
-*Gambar 12. Placeholder screenshot session sebelum dan sesudah force recreate.*
+*Gambar 12a. Placeholder screenshot perintah force recreate container app.*
+
+![Session invalid](screenshots/13-sesi-invalid.png)
+
+*Gambar 12b. Placeholder screenshot action `me` setelah session menjadi invalid.*
 
 ### 8.3 Implikasi terhadap Scalability
 
@@ -456,13 +489,14 @@ Screenshot yang perlu diganti atau dilengkapi sebelum laporan dikumpulkan:
 3. `screenshots/03-security-group.png` - Security Group port 22 dan 80.
 4. `screenshots/03-skema-database.png` - skema tabel database.
 5. `screenshots/04-user-data.png` - User Data atau cloud-init.
-6. `screenshots/06-compose-healthy.png` - container healthy.
-7. `screenshots/07-browser-public-ip.png` - aplikasi melalui Public IP.
-8. `screenshots/09-set-cookie.png` - Set-Cookie SID.
-9. `screenshots/10-submit-puisi.png` - data puisi.
-10. `screenshots/11-refresh-text-flash.png` - text flash refresh.
-11. `screenshots/12-api-testing.png` - hasil pengujian API.
-12. `screenshots/13-stateful-before-after.png` - bukti session hilang.
+6. `screenshots/05-ssh-docker-swap.png` - versi Docker, Compose, dan swap.
+7. `screenshots/06-compose-healthy.png` - container healthy.
+8. `screenshots/08-register.png`, `screenshots/08-login.png`, `screenshots/08-login(1).png` - register, login, dan halaman setelah login.
+9. `screenshots/09-set-cookie.png` - Set-Cookie SID.
+10. `screenshots/10-submit-puisi.png`, `screenshots/10-submit-puisi(1).png` - submit puisi dan hasil load puisi.
+11. `screenshots/11-api-testing-register.png`, `screenshots/11-api-testing-login.png`, `screenshots/11-api-testing-submit_puisi.png`, `screenshots/11-api-testing-daftar_puisi.png`, `screenshots/11-api-testing-action_me.png` - hasil pengujian Invoke-WebRequest.
+12. `screenshots/13-restart-container.png`, `screenshots/13-sesi-invalid.png` - bukti session hilang setelah recreate.
+
 
 ## 11. Referensi dan Informasi Deployment
 
