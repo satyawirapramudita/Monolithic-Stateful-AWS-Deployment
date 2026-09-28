@@ -26,7 +26,7 @@ async function api(action, method = "GET", body = null) {
     // Pakai prefix /api agar via CloudFront routing ke origin EC2 (behavior /api*).
     // Server Python mengabaikan path dan hanya baca query ?action=, jadi
     // /api/?action=... tetap works untuk dev lokal (localhost:8000) maupun EC2 langsung.
-    const res = await fetch(`/api/?action=${action}`, options);
+    const res = await fetch(`/api?action=${action}`, options);
     const data = await res.json().catch(() => ({}));
     return { status: res.status, data };
 }
