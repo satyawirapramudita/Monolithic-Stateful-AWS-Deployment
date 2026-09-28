@@ -114,3 +114,81 @@ hr {
 .hidden {
     display: none;
 }
+
+/* ── Template radio labels ── */
+.template-label {
+    display: inline-block;
+    border: 2px solid #808080;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 13px;
+    background-color: #f0f0f0;
+    user-select: none;
+}
+
+.template-label:has(input:checked) {
+    background-color: #dcdcdc;
+    border-color: #000000;
+    font-weight: bold;
+}
+
+/* ── Grid kartu puisi ── */
+.puisi-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 12px;
+}
+
+.puisi-card {
+    width: 300px;
+    border: 1px solid #808080;
+    background-color: #f8f8f8;
+    font-size: 13px;
+    overflow: hidden;
+}
+
+.puisi-card img {
+    width: 100%;
+    height: auto; /* tampilkan gambar utuh, jangan dipotong */
+    display: block;
+}
+
+/* Placeholder inisial untuk puisi tanpa gambar */
+.puisi-card-placeholder {
+    width: 100%;
+    height: 120px;
+    background-color: #dcdcdc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: #555555;
+    font-family: "Times New Roman", Times, serif;
+}
+
+.puisi-card-info {
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.puisi-card-info strong {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.puisi-card-info small {
+    font-size: 11px;
+    color: #555555;
+}
+
+/* Pesan kosong di grid */
+p.empty {
+    font-style: italic;
+    color: #555555;
+    padding: 12px 0;
+}

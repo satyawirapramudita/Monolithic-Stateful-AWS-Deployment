@@ -66,7 +66,38 @@
                 <input type="text" id="puisi-keyword" name="keyword" maxlength="255" size="50" placeholder="pisahkan dengan koma"><br><br>
                 Isi Puisi: <br>
                 <textarea id="puisi-isi" name="isi" rows="8" cols="50" required></textarea><br><br>
-                <input type="submit" value="Kirim Puisi">
+                Kutipan Bait (untuk gambar): <br>
+                <small>Penggalan singkat yang akan ditampilkan di gambar puisi (max 200 karakter)</small><br>
+                <textarea id="puisi-bait" name="bait" rows="3" cols="50" maxlength="200" placeholder="Tulis bait pendek pilihan Anda di sini..."></textarea><br><br>
+                Template Gambar: <br>
+                <small>Pilih latar belakang gambar puisi</small><br>
+                <div id="template-choices">
+                    <label class="template-label">
+                        <input type="radio" name="template" id="tpl-1" value="1" checked>
+                        <span class="template-name">1</span>
+                    </label>
+                    &nbsp;
+                    <label class="template-label">
+                        <input type="radio" name="template" id="tpl-2" value="2">
+                        <span class="template-name">2</span>
+                    </label>
+                    &nbsp;
+                    <label class="template-label">
+                        <input type="radio" name="template" id="tpl-3" value="3">
+                        <span class="template-name">3</span>
+                    </label>
+                    &nbsp;
+                    <label class="template-label">
+                        <input type="radio" name="template" id="tpl-4" value="4">
+                        <span class="template-name">4</span>
+                    </label>
+                </div><br>
+                <div id="preview-wrapper">
+                    <b>Preview Gambar:</b><br>
+                    <img id="preview-gambar" alt="Preview gambar puisi akan muncul di sini" src="" style="display:none; max-width:400px; border:1px solid #808080; margin-top:6px;">
+                    <p id="preview-status" style="font-style:italic; color:#555;"></p>
+                </div><br>
+                <input type="submit" value="Kirim Puisi" id="btn-submit-puisi">
             </fieldset>
         </form>
 
@@ -74,18 +105,7 @@
 
         <h3>Daftar Puisi Saya</h3>
         <button id="btn-refresh" type="button">Muat Ulang</button>
-        <table id="tabel-puisi" width="100%" border="1" cellpadding="4" cellspacing="0">
-            <thead>
-                <tr>
-                    <th>Tgl Submit</th>
-                    <th>Judul</th>
-                    <th>Kategori</th>
-                    <th>Keyword</th>
-                    <th>Isi</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div id="grid-puisi" class="puisi-grid"></div>
     </div>
 
 </td></tr>

@@ -3,3 +3,6 @@ sessions/
 __pycache__/
 *.pyc
 db_data/
+tests/
+node_modules/
+*.zip

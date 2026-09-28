@@ -485,3 +485,133 @@ Swap: 2 GB
 Repository commit: f6857dd
 Application URL: http://52.74.6.106
 ```
+
+---
+
+## Bagian 3: Fitur Gambar Puisi (S3 + Lambda Image Generator)
+
+### Gambaran Arsitektur Baru
+
+```
+[Browser]
+   │
+   ├─ Static assets (html/css/js/template) ──► CloudFront ──► S3 (origin default)
+   │
+   ├─ /generate-puisi?... ──────────────────► CloudFront ──► Lambda Function URL
+   │     (preview: return JPEG base64)              (behavior baru)
+   │     (save=true: return JSON filename)
+   │
+   └─ /?action=... (login/register/submit/list) ► CloudFront ──► EC2 backend (HTTP origin)
+```
+
+### 3.1 Migration Database
+
+Jalankan migration pada database yang sudah berjalan di EC2 (JANGAN jalankan ulang `init.sql`):
+
+```bash
+# Masuk ke container DB atau gunakan MySQL client eksternal
+docker exec -i scalablesatya-db-1 mysql -u puisi_user -p puisi_db < db/migrate_001_gambar.sql
+```
+
+Kolom yang ditambahkan:
+- `bait TEXT NULL` — kutipan pendek untuk gambar
+- `gambar_file VARCHAR(255) NULL` — path file gambar di S3 (`hasil-puisi/xxxx.jpg`)
+
+### 3.2 Upload Template ke S3
+
+Upload minimal 3 file template gambar ke **root bucket** (bukan ke subfolder `hasil-puisi/`):
+
+```bash
+aws s3 cp template1.jpg s3://NAMA_BUCKET/template1.jpg --acl public-read
+aws s3 cp template2.jpg s3://NAMA_BUCKET/template2.jpg --acl public-read
+aws s3 cp template3.jpg s3://NAMA_BUCKET/template3.jpg --acl public-read
+```
+
+Dimensi yang disarankan: **1200×675 px** (16:9), JPEG atau PNG.
+
+### 3.3 Deploy Lambda `generate-puisi-image`
+
+```bash
+cd lambda/generate-puisi-image
+npm install
+zip -r function.zip index.mjs package.json node_modules/
+
+# Buat Lambda function
+aws lambda create-function \
+  --function-name generate-puisi-image \
+  --runtime nodejs20.x \
+  --handler index.handler \
+  --zip-file fileb://function.zip \
+  --role arn:aws:iam::ACCOUNT_ID:role/lambda-puisi-role \
+  --memory-size 256 \
+  --timeout 15 \
+  --environment "Variables={S3_BUCKET=NAMA_BUCKET,S3_REGION=ap-southeast-1}"
+
+# Buat Function URL (tanpa IAM auth — akses dikontrol CloudFront)
+aws lambda create-function-url-config \
+  --function-name generate-puisi-image \
+  --auth-type NONE
+```
+
+IAM policy untuk execution role Lambda (scope ke prefix spesifik):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    { "Effect": "Allow", "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::NAMA_BUCKET/template*" },
+    { "Effect": "Allow", "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::NAMA_BUCKET/hasil-puisi/*" }
+  ]
+}
+```
+
+### 3.4 Tambah CloudFront Behavior `/generate-puisi*`
+
+Di console CloudFront → distribusi yang sudah ada → **Behaviors → Create behavior**:
+
+| Field | Nilai |
+|-------|-------|
+| Path pattern | `/generate-puisi*` |
+| Origin | Lambda Function URL baru (tambah sebagai Custom Origin, port 443, HTTPS) |
+| Viewer protocol | Redirect HTTP to HTTPS |
+| Cache policy | `CacheWithQueryString` untuk request preview |
+| Origin request policy | `AllViewerExceptHostHeader` |
+
+**Catatan cache policy untuk `save=true`:**  
+Frontend menambahkan `&_t={timestamp}` pada setiap request `save=true` sehingga URL selalu unik dan tidak pernah terlayani dari cache — tidak perlu behavior atau cache policy terpisah.
+
+### 3.5 Update Backend EC2
+
+Tambahkan `ASSET_BASE_URL` ke file `.env` di EC2:
+
+```bash
+echo "ASSET_BASE_URL=https://DISTRIBUSI_ID.cloudfront.net" >> .env
+docker compose up -d --force-recreate app
+```
+
+### 3.6 Update Frontend `app.js`
+
+Ubah konstanta `GENERATOR_BASE_URL` di baris pertama `frontend/app.js`:
+
+```javascript
+const GENERATOR_BASE_URL = "https://DISTRIBUSI_ID.cloudfront.net";
+```
+
+Lalu deploy ulang file statis ke S3:
+
+```bash
+aws s3 sync frontend/ s3://NAMA_BUCKET/ --exclude "*.py"
+aws cloudfront create-invalidation --distribution-id DISTRIBUSI_ID --paths "/app.js" "/index.html"
+```
+
+### 3.7 Verifikasi Fungsional
+
+| Skenario | Perintah / Aksi | Hasil yang Diharapkan |
+|----------|----------------|----------------------|
+| Preview gambar | Isi judul + bait di form, tunggu 400ms | `<img>` muncul dengan gambar hasil render |
+| Submit puisi | Klik "Kirim Puisi" | Lambda dipanggil `save=true`, `gambar_file` tersimpan di DB |
+| Daftar puisi | Refresh daftar | Grid kartu dengan thumbnail gambar S3 |
+| Dev lokal | `GENERATOR_BASE_URL=""` | Placeholder inisial, form submit tetap berhasil |
+

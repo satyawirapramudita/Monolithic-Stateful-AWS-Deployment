@@ -106,3 +106,52 @@ Draft langkah (dilakukan setelah resource AWS tersedia):
 - Laporan PDF (`docs/laporan.md` → PDF)
 - Tautan repositori GitHub
 - Alamat IP Publik EC2 (demo saat kelas)
+
+---
+
+## Fitur Gambar Puisi (Tugas Bagian 3)
+
+### Arsitektur Tambahan
+
+```
+Browser
+ ├─ Aset statis (html/css/js/template jpg) ──► CloudFront ──► S3
+ ├─ /generate-puisi?...  ─────────────────► CloudFront ──► Lambda (Node.js + Jimp)
+ │       mode preview (save omit): return JPEG base64
+ │       mode save (save=true):    upload ke S3, return JSON {filename}
+ └─ /?action=... ─────────────────────────► CloudFront ──► EC2 backend (Python)
+```
+
+### Komponen Baru
+
+| Komponen | Lokasi | Keterangan |
+|----------|--------|-----------|
+| Migration DB | `db/migrate_001_gambar.sql` | Tambah kolom `bait` dan `gambar_file` ke tabel `puisi` |
+| Lambda handler | `lambda/generate-puisi-image/index.mjs` | Jimp v0.22.12, mode preview + save |
+| README Lambda | `lambda/generate-puisi-image/README.md` | Setup AWS, IAM policy, trade-off cache |
+
+### Endpoint Backend Baru / Diubah
+
+| Aksi | Perubahan |
+|------|-----------|
+| `submit_puisi` | Terima field baru: `bait`, `template`, `gambar_file` |
+| `daftar_puisi` | Response menyertakan `gambar_file` dan `gambar_url` (URL lengkap CloudFront) |
+
+### Konfigurasi Cepat
+
+1. **Jalankan migration DB** (satu kali, di EC2):
+   ```bash
+   docker exec -i CONTAINER_DB mysql -u puisi_user -p puisi_db < db/migrate_001_gambar.sql
+   ```
+2. **Deploy Lambda** `generate-puisi-image` (lihat `lambda/generate-puisi-image/README.md`)
+3. **Tambah CloudFront behavior** `/generate-puisi*` → Lambda Function URL
+4. **Set env var** `ASSET_BASE_URL` di EC2 `.env`
+5. **Update konstanta** `GENERATOR_BASE_URL` di `frontend/app.js`
+6. **Sync frontend** ke S3 dan invalidate CloudFront cache
+
+### Dev Lokal (tanpa Lambda)
+
+Biarkan `GENERATOR_BASE_URL = ""` di `app.js`. Aplikasi akan:
+- Menampilkan placeholder inisial (huruf pertama judul) di grid puisi
+- Mengizinkan submit puisi tanpa `gambar_file` (kolom NULL di DB)
+- `docker-compose.yml` tidak berubah — tetap valid untuk dev lokal

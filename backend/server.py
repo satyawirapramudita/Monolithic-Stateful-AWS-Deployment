@@ -20,6 +20,10 @@ DB_USER = os.environ.get("DB_USER", "puisi_user")
 DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
 DB_NAME = os.environ.get("DB_NAME", "puisi_db")
 PORT = int(os.environ.get("PORT", "8000"))
+# Base URL aset statis (CloudFront/S3). Dipakai untuk membentuk URL gambar puisi.
+# Contoh: https://d1234abcd.cloudfront.net
+# Kosongkan di lokal — frontend akan menangani fallback.
+ASSET_BASE_URL = os.environ.get("ASSET_BASE_URL", "").rstrip("/")
 
 BASE_DIR = Path(__file__).resolve().parent
 FRONTEND_DIR = BASE_DIR / "frontend"
@@ -306,6 +310,9 @@ class PuisiHandler(BaseHTTPRequestHandler):
         isi = str(body.get("isi", "")).strip()
         kategori = str(body.get("kategori", "")).strip()
         keyword = str(body.get("keyword", "")).strip()
+        # Field baru: kutipan pendek untuk gambar, template yang dipilih, dan nama file gambar
+        bait = self.clean_str(body.get("bait", ""), 500)
+        gambar_file = self.clean_str(body.get("gambar_file", ""), 255)
         if not (1 <= len(judul) <= 150):
             self.send_json(400, {"ok": False, "message": "Judul wajib diisi (max 150)"})
             return
@@ -315,13 +322,29 @@ class PuisiHandler(BaseHTTPRequestHandler):
         if not (1 <= len(kategori) <= 50):
             self.send_json(400, {"ok": False, "message": "Kategori wajib diisi (max 50)"})
             return
+        # gambar_file boleh kosong (untuk dev lokal tanpa Lambda).
+        # Regex: hanya izinkan path satu level (prefix/nama.ext), tanpa '..' atau leading '/'
+        # Contoh valid:   "hasil-puisi/puisi-1234-abcd.jpg"
+        # Contoh invalid: "../../etc/passwd", "/etc/passwd", "nama/../secret"
+        if gambar_file and not re.fullmatch(r"[\w-][\w/-]*\.[\w]{1,10}", gambar_file):
+            self.send_json(400, {"ok": False, "message": "Format gambar_file tidak valid"})
+            return
         conn = db_connect()
         try:
             with conn.cursor() as cur:
                 cur.execute(
-                    "INSERT INTO puisi (user_id, judul, tgl_submit, isi, kategori, keyword) "
-                    "VALUES (%s, %s, NOW(), %s, %s, %s)",
-                    (session["user_id"], judul, isi, kategori, keyword or None),
+                    "INSERT INTO puisi "
+                    "(user_id, judul, tgl_submit, isi, bait, kategori, keyword, gambar_file) "
+                    "VALUES (%s, %s, NOW(), %s, %s, %s, %s, %s)",
+                    (
+                        session["user_id"],
+                        judul,
+                        isi,
+                        bait or None,
+                        kategori,
+                        keyword or None,
+                        gambar_file or None,
+                    ),
                 )
                 id_puisi = cur.lastrowid
         finally:
@@ -337,7 +360,8 @@ class PuisiHandler(BaseHTTPRequestHandler):
         try:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT p.id, p.judul, p.tgl_submit, p.kategori, p.isi, p.keyword, u.nama "
+                    "SELECT p.id, p.judul, p.tgl_submit, p.kategori, p.bait, "
+                    "p.keyword, p.gambar_file, u.nama "
                     "FROM puisi p JOIN users u ON p.user_id = u.id "
                     "WHERE p.user_id = %s ORDER BY p.tgl_submit DESC",
                     (session["user_id"],),
@@ -345,6 +369,10 @@ class PuisiHandler(BaseHTTPRequestHandler):
                 rows = cur.fetchall()
         finally:
             conn.close()
+        # Bentuk URL gambar lengkap agar frontend tinggal pakai di <img src>
+        for row in rows:
+            gf = row.get("gambar_file")
+            row["gambar_url"] = f"{ASSET_BASE_URL}/{gf}" if ASSET_BASE_URL and gf else ""
         self.send_json(200, {"ok": True, "puisi": rows})
 
 
