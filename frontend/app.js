@@ -4,10 +4,10 @@
 //   "https://d1234abcd.cloudfront.net"
 // Kosongkan ("") untuk dev lokal — preview akan diganti placeholder dan submit
 // tetap bisa dilakukan tanpa gambar (gambar_file = "").
-const GENERATOR_BASE_URL = "https://g2gjiotex5ltwhvtb2brlmdada0iultc.lambda-url.us-east-1.on.aws";
+const GENERATOR_BASE_URL = window.location.origin;
 
 // Kosongkan: kita panggil Function URL Lambda langsung, bukan lewat path CloudFront /generate-puisi
-const GENERATE_PATH = "";
+const GENERATE_PATH = "/fungsi";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 const $ = (id) => document.getElementById(id);
