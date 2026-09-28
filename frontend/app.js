@@ -23,7 +23,10 @@ async function api(action, method = "GET", body = null) {
         options.headers["Content-Type"] = "application/json";
         options.body = JSON.stringify(body);
     }
-    const res = await fetch(`/?action=${action}`, options);
+    // Pakai prefix /api agar via CloudFront routing ke origin EC2 (behavior /api*).
+    // Server Python mengabaikan path dan hanya baca query ?action=, jadi
+    // /api/?action=... tetap works untuk dev lokal (localhost:8000) maupun EC2 langsung.
+    const res = await fetch(`/api/?action=${action}`, options);
     const data = await res.json().catch(() => ({}));
     return { status: res.status, data };
 }
@@ -337,7 +340,34 @@ async function loadPuisi() {
             kat.textContent = p.kategori || "";
             info.appendChild(kat);
 
+            const hint = document.createElement("small");
+            hint.textContent = "Klik untuk lihat isi";
+            hint.style.fontStyle = "italic";
+            info.appendChild(hint);
+
             card.appendChild(info);
+
+            // Detail isi puisi — halaman putih sederhana di bawah gambar, hidden by default
+            const detail = document.createElement("div");
+            detail.className = "puisi-detail hidden";
+            const isiText = document.createElement("div");
+            isiText.className = "puisi-isi";
+            isiText.textContent = p.isi || "(Isi puisi kosong)";
+            detail.appendChild(isiText);
+            if (p.bait) {
+                const baitText = document.createElement("div");
+                baitText.className = "puisi-bait-text";
+                baitText.textContent = `Bait: ${p.bait}`;
+                detail.appendChild(baitText);
+            }
+            card.appendChild(detail);
+
+            card.style.cursor = "pointer";
+            card.title = "Klik untuk lihat / sembunyikan isi";
+            card.addEventListener("click", () => {
+                detail.classList.toggle("hidden");
+            });
+
             grid.appendChild(card);
         }
         return true;

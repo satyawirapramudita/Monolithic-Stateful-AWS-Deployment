@@ -360,7 +360,7 @@ class PuisiHandler(BaseHTTPRequestHandler):
         try:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT p.id, p.judul, p.tgl_submit, p.kategori, p.bait, "
+                    "SELECT p.id, p.judul, p.tgl_submit, p.kategori, p.isi, p.bait, "
                     "p.keyword, p.gambar_file, u.nama "
                     "FROM puisi p JOIN users u ON p.user_id = u.id "
                     "WHERE p.user_id = %s ORDER BY p.tgl_submit DESC",
