@@ -2,6 +2,8 @@
 
 Tugas PACS262521 - Pengembangan Perangkat Lunak Scalable: membangun aplikasi **monolitik stateful** sebagai baseline ("ground truth") sebelum memahami arsitektur stateless dan horizontal scaling.
 
+> **Catatan:** repositori ini adalah versi monolitik awal dan tidak dikembangkan lagi. Versi lanjutannya (microservice stateless dengan Nginx gateway, RabbitMQ, dan horizontal scaling) ada di **[Final_Project_Scalable](https://github.com/satyawirapramudita/Final_Project_Scalable)**.
+
 ## Arsitektur
 
 - **Backend**: Python murni (`http.server` stdlib) dalam **satu file** `backend/server.py`, tanpa framework. Routing single-path: semua aksi lewat `/?action=<aksi>`.
